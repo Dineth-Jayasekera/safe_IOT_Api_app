@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v1\StudentManagement;
 use App\Helpers\HelperFunctions;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class StudentRegistrationController extends Controller
@@ -44,6 +45,11 @@ class StudentRegistrationController extends Controller
         if ($validator->fails()) {
             return $this->HelperFunctions->validateRequest($validator);
         }
+//
+//        $status = DB::insert('INSERT INTO `person_data` (`name`,`address`,`lat`,`lng`,`contact_number`,`need`,`is_need_show`,`user_id`) VALUES (?,?,?,?,?,?,?,?)',
+//            [$request->full_name, $request->address, $request->lat, $request->lng, $request->contact_number, $request->need, $request->is_need_show, $user_id]);
+//
+//        if ($status == "true") {}
 
     }
 }
