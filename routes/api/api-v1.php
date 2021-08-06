@@ -43,30 +43,18 @@ Route::get('login-invalid', function () {
 
 Route::group(['middleware' => $Api_Version . '.app.auth.token'], function () use ($Api_Version) {
 
-    /**Non Auth Routes*/
 
-    Route::group(['prefix' => 'user'], function () use ($Api_Version) {
+    Route::group(['prefix' => 'safe'], function () use ($Api_Version) {
 
-        Route::post('login-user', $Api_Version . '\UserManagementController@loginUser');
+        Route::post('update-device-log', $Api_Version . '\SafeManagement\SafeIOTApisController@updateDeviceLog');
 
-    });
+        Route::GET('asking-for-job', $Api_Version . '\SafeManagement\SafeIOTApisController@askingForJob');
 
-    /**Auth Routes*/
+        Route::POST('open-close', $Api_Version . '\SafeManagement\SafeIOTApisController@OpenClose');
 
-//    Route::group(['middleware' => $Api_Version . '.login.status'], function () use ($Api_Version) {
-
-    Route::group(['prefix' => 'user'], function () use ($Api_Version) {
-
-        Route::get('get-details', $Api_Version . '\UserManagementController@userDetails');
+        Route::POST('tampler-aleart', $Api_Version . '\SafeManagement\SafeIOTApisController@tamplerAleart');
 
     });
 
-    Route::group(['prefix' => 'student'], function () use ($Api_Version) {
-
-        Route::post('pre-registration-individual', $Api_Version . '\StudentManagement\StudentRegistrationController@studentPreRegistration');
-
-    });
-
-//    });
 
 });

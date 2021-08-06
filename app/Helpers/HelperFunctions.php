@@ -4,6 +4,8 @@
 namespace App\Helpers;
 
 
+use Illuminate\Support\Facades\DB;
+
 class HelperFunctions
 {
 
@@ -106,6 +108,38 @@ class HelperFunctions
 
 
         }
+    }
+
+    function getDeviceId($safe_id){
+
+        $safe_details = DB::select('SELECT * FROM device WHERE safe_id= ?', [$safe_id]);
+
+        return $safe_details[0]->id;
+
+    }
+    function getReleaseStates($safe_id){
+
+        $safe_details = DB::select('SELECT * FROM jobs WHERE device_id=? AND status=?;', [$safe_id,1]);
+
+        if($safe_details==[]){
+            return 1;
+        }else{
+            return 0;
+        }
+
+
+    }
+    function getCurrentClientId($safe_id){
+
+        $safe_details = DB::select('SELECT * FROM jobs WHERE device_id=? ORDER BY ID DESC LIMIT 1;', [$safe_id]);
+
+        if($safe_details==[]){
+            $safe_related_user_details = DB::select('SELECT * FROM device_has_user WHERE device_id= ? ORDER BY id ASC LIMIT 1;', [$safe_id]);
+            return $safe_related_user_details[0]->user_id;
+        }else{
+            return $safe_details[0]->user_id;
+        }
+
     }
 
 }
