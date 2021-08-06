@@ -149,9 +149,7 @@ class SafeIOTApisController extends Controller
 
             'safe_id' => 'required|string',
             'longitude' => 'required|string',
-            'latitude' => 'required|string',
-            'open_state' => 'required|int',
-            'client_id' => 'required|int',
+            'latitude' => 'required|string'
 
 
         ]);
@@ -162,12 +160,6 @@ class SafeIOTApisController extends Controller
 
         $device_id = $this->HelperFunctions->getDeviceId($request->safe_id);
 
-        $state = "close";
-        if ($request->open_state == 1) {
-            $state = "open";
-        }
-
-        $update_job = DB::update('UPDATE device SET state=? WHERE id=?', [$state, $device_id]);
 
 
         return $this->HelperFunctions->returnData(array(), true, "Updated", 200);
