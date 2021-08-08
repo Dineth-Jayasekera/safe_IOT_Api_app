@@ -54,6 +54,10 @@ Route::group(['middleware' => $Api_Version . '.app.auth.token'], function () use
 
         Route::POST('tampler-aleart', $Api_Version . '\SafeManagement\SafeIOTApisController@tamplerAleart');
 
+        Route::POST('send-otp', $Api_Version . '\SafeManagement\SafeIOTApisController@sendOtp');
+
+        Route::POST('create-job', $Api_Version . '\SafeManagement\SafeIOTApisController@createJob');
+
     });
 
 

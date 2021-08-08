@@ -160,12 +160,96 @@ class SafeIOTApisController extends Controller
 
         $device_id = $this->HelperFunctions->getDeviceId($request->safe_id);
 
+        $current_client_id = $this->HelperFunctions->getCurrentClientId($device_id);
 
+        $client_details = $this->HelperFunctions->getClientDetails($current_client_id);
 
-        return $this->HelperFunctions->returnData(array(), true, "Updated", 200);
+        $msg = "Breach Detected";
+
+        $send_sms = $this->HelperFunctions->sendSMS($client_details->phone_number, $msg);
+
+        if ($send_sms == "SEND") {
+            return $this->HelperFunctions->returnData(array(), true, "Alert Send", 200);
+        }else{
+            return $this->HelperFunctions->returnData(array(), true, "Alert Send Failed", 200);
+        }
 
 
     }
 
+
+    public function sendOtp(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+
+            'safe_id' => 'required|string',
+            'rfid_uuid' => 'required|string',
+            'current_client_id' => 'required|int',
+            'longitude' => 'required|string',
+            'latitude' => 'required|string'
+
+
+        ]);
+
+        if ($validator->fails()) {
+            return $this->HelperFunctions->validateRequest($validator);
+        }
+
+        $device_id = $this->HelperFunctions->getDeviceId($request->safe_id);
+
+        $current_client_id = $this->HelperFunctions->getCurrentClientId($device_id);
+
+        $client_details = $this->HelperFunctions->getClientDetails($current_client_id);
+
+
+        $otp = $this->HelperFunctions->genarateOTPNumber();
+        $msg = "Your OTP Code Is : " . $otp;
+
+        $send_sms = $this->HelperFunctions->sendSMS($client_details->phone_number, $msg);
+
+        if ($send_sms == "SEND") {
+            $data=array(
+                "otp"=>$otp
+            );
+            return $this->HelperFunctions->returnData($data, true, "OTP Send", 200);
+        }else{
+            return $this->HelperFunctions->returnData(array(), true, "OTP Failed", 200);
+        }
+
+    }
+
+    public function createJob(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+
+            'safe_id' => 'required|string',
+            'longitude' => 'required|string',
+            'latitude' => 'required|string',
+            'job_type' => 'required|string',
+            'rfid_uuid' => 'required|string',
+            'client_id' => 'required|integer',
+
+        ]);
+
+        if ($validator->fails()) {
+            return $this->HelperFunctions->validateRequest($validator);
+        }
+
+        $device_id = $this->HelperFunctions->getDeviceId($request->safe_id);
+
+//        $release_states = $this->HelperFunctions->getReleaseStates($device_id);
+
+        $status = DB::insert('INSERT INTO `jobs` (type,status,created_on,update_on,device_id,user_id) VALUES (?,?,?,?,?,?)',
+            [$request->job_type, 0, time(), time(), $device_id, $request->client_id]);
+
+        if ($status == "true") {
+
+            return $this->HelperFunctions->returnData(array(), true, "successfully Added", 200);
+
+        }
+
+    }
 
 }

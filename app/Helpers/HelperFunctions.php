@@ -142,4 +142,69 @@ class HelperFunctions
 
     }
 
+    function getClientDetails($client_id){
+
+        $client_details = DB::select('SELECT * FROM user WHERE id=?;', [$client_id]);
+
+        return $client_details[0];
+
+    }
+
+    function genarateOTPNumber() {
+
+        return mt_rand(0000, 9999);
+    }
+
+    function sendSMS($number,$msg) {
+
+        $pno_ar = str_split($number);
+
+        if (sizeof($pno_ar) > 11) {
+            echo 'Invalid Number';
+            return 'Invalid Number';
+        }
+
+
+        if ($pno_ar[0] == 0) {
+            $pno = '94' . $pno_ar[1] . $pno_ar[2] . $pno_ar[3] . $pno_ar[4] . $pno_ar[5] . $pno_ar[6] . $pno_ar[7] . $pno_ar[8] . $pno_ar[9];
+        }
+
+
+//**Shout**/
+
+        $api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjZDAzZjg4MC1mODI1LTExZWItODZkNC0wOWZkOGM1MTIxYWMiLCJzdWIiOiJTSE9VVE9VVF9BUElfVVNFUiIsImlhdCI6MTYyODQxMjY4MCwiZXhwIjoxOTQzOTQ1NDgwLCJzY29wZXMiOnsiYWN0aXZpdGllcyI6WyJyZWFkIiwid3JpdGUiXSwibWVzc2FnZXMiOlsicmVhZCIsIndyaXRlIl0sImNvbnRhY3RzIjpbInJlYWQiLCJ3cml0ZSJdfSwic29fdXNlcl9pZCI6IjEyNDg0Iiwic29fdXNlcl9yb2xlIjoidXNlciIsInNvX3Byb2ZpbGUiOiJhbGwiLCJzb191c2VyX25hbWUiOiIiLCJzb19hcGlrZXkiOiJub25lIn0.2J8OH1ztmPsF9XOWdjR6K_0YoPwcpWlzwF_tUQ2s3ro";
+
+        $data = array(
+            "source" => "ShoutDEMO",
+            "transports" => array("sms"),
+            "content" => array(
+                "sms" =>  $msg
+            ),
+            "destinations" => array($pno)
+        );
+
+        $data_string = json_encode($data);
+        $ch = curl_init('https://api.getshoutout.com/coreservice/messages');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $api_key
+        ));
+
+        $result = curl_exec($ch);
+        $response_sms = json_decode($result);
+        curl_close($ch);
+
+        if ($response_sms->status == "1001") {
+            return 'SEND';
+        } else {
+            return 'FAILED';
+        }
+
+
+
+    }
+
 }
